@@ -1,14 +1,19 @@
-package com.gorani.jetpack_room
+package com.gorani.jetpack_room.database
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.gorani.jetpack_room.dao.TextDao
+import com.gorani.jetpack_room.dao.WordDao
+import com.gorani.jetpack_room.entity.TextEntity
+import com.gorani.jetpack_room.entity.WordEntity
 
-@Database(entities = [TextEntity::class], version = 1)
+@Database(entities = [TextEntity::class, WordEntity::class], version = 2)
 abstract class TextDatabase : RoomDatabase() {
 
     abstract fun textDao(): TextDao
+    abstract fun wordDao(): WordDao
 
     companion object {
         @Volatile
