@@ -8,6 +8,7 @@ import com.gorani.jetpack_room.entity.TextEntity
 
 @Dao
 interface TextDao {
+
     @Query("SELECT * FROM text_table")
     fun getAllData() : List<TextEntity>
 

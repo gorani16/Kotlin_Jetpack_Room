@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import com.gorani.jetpack_room.database.TextDatabase
 import com.gorani.jetpack_room.entity.TextEntity
 import com.gorani.jetpack_room.entity.WordEntity
@@ -33,6 +34,7 @@ import kotlinx.coroutines.launch
  * 스레드의 부하 상황에 맞춰 코루틴을 배분한다.
  * - 스레드를 배치하여 관리해주는것.
  * https://kotlinworld.com/141?category=973476
+ * https://developer.android.com/kotlin/coroutines/coroutines-adv?hl=ko
  *
  */
 
@@ -54,33 +56,28 @@ class MainActivity : AppCompatActivity() {
         findViewById(R.id.tv_result)
     }
 
+    private lateinit var viewModel: MainViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val db = TextDatabase.getDatabase(this)
+        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        viewModel.getData()
 
         btnInsert.setOnClickListener {
-            CoroutineScope(Dispatchers.IO).launch {
-                db.textDao().insert(TextEntity(0,inputArea.text.toString()))
-                db.wordDao().insert(WordEntity(0,inputArea.text.toString()))
-                inputArea.setText("")
-            }
+            val text = inputArea.text.toString()
+            viewModel.insertData(text)
+            inputArea.setText("")
         }
 
         btnGetData.setOnClickListener {
-            CoroutineScope(Dispatchers.IO).launch {
-                val textData = db.textDao().getAllData()
-                Log.d("DB_Data : ", textData.toString())
-                Log.d("DB_Data : ", db.wordDao().getAllData().toString())
-            }
+            viewModel.getData()
+            Log.d("ActivityData : ", viewModel.getData().toString())
         }
 
         btnDelete.setOnClickListener {
-            CoroutineScope(Dispatchers.IO).launch {
-                db.textDao().deleteAllData()
-                db.wordDao().deleteAllData()
-            }
+            viewModel.removeData()
         }
 
     }
