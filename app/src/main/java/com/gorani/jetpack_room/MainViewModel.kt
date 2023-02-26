@@ -10,12 +10,16 @@ import androidx.lifecycle.viewModelScope
 import com.gorani.jetpack_room.database.TextDatabase
 import com.gorani.jetpack_room.entity.TextEntity
 import com.gorani.jetpack_room.entity.WordEntity
+import com.gorani.jetpack_room.repository.Repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
  * ViewModel 에서 context 를 필요로 할 때 해결하는 방법
  * https://youngest-programming.tistory.com/327
+ *
+ * 종속 항목 수동 삽입 : 구조 변경 - Repository
+ * https://developer.android.com/training/dependency-injection/manual?hl=ko
  */
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -30,6 +34,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _wordList = MutableLiveData<List<WordEntity>>()
     val wordList: LiveData<List<WordEntity>> = _wordList
 
+    val repository = Repository(context)
+
     /**
      * Coroutines 의 세 가지 Dispatchers 와 용도
      * Main Thread 에서 Database 에 접근하는 것은 불가능하다. (메인 쓰레드에서 데이터 불러오기)
@@ -42,26 +48,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      */
 
     fun getData() = viewModelScope.launch(Dispatchers.IO) {
-        val textData = db.textDao().getAllData()
-        val wordData = db.wordDao().getAllData()
-        Log.d("get_Data : ", textData.toString())
-        Log.d("get_Data : ", wordData.toString())
+//        db.textDao().getAllData()
+//        db.wordDao().getAllData()
+        val textData = repository.getTextList()
+        val wordData = repository.getWordList()
 
         _textList.postValue(textData)
         _wordList.postValue(wordData)
-        Log.d("_textList : ", _textList.value.toString())
 
     }
 
     fun insertData(text: String) = viewModelScope.launch(Dispatchers.IO) {
-        db.textDao().insert(TextEntity(0, text))
-        db.wordDao().insert(WordEntity(0, text))
+//        db.textDao().insert(TextEntity(0, text))
+//        db.wordDao().insert(WordEntity(0, text))
+        repository.insertTextData(text)
+        repository.insertWordData(text)
 
     }
 
     fun removeData() = viewModelScope.launch(Dispatchers.IO) {
-        db.textDao().deleteAllData()
-        db.wordDao().deleteAllData()
+//        db.textDao().deleteAllData()
+//        db.wordDao().deleteAllData()
+        repository.deleteTextData()
+        repository.deleteWordData()
     }
 
 }
