@@ -7,6 +7,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.gorani.jetpack_room.adapter.CustomAdapter
 import com.gorani.jetpack_room.database.TextDatabase
 import com.gorani.jetpack_room.entity.TextEntity
 import com.gorani.jetpack_room.entity.WordEntity
@@ -52,18 +55,23 @@ class MainActivity : AppCompatActivity() {
     private val btnDelete: Button by lazy {
         findViewById(R.id.btn_delete_all)
     }
-    private val resultArea: TextView by lazy {
-        findViewById(R.id.tv_result)
+
+    private val viewModel: MainViewModel by lazy {
+        ViewModelProvider(this)[MainViewModel::class.java]
     }
 
-    private lateinit var viewModel: MainViewModel
+    private val rv: RecyclerView by lazy {
+        findViewById(R.id.rv)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
-        viewModel.getData()
+        viewModel.textList.observe(this) { textList ->
+            rv.adapter = CustomAdapter(textList)
+            rv.layoutManager = LinearLayoutManager(this)
+        }
 
         btnInsert.setOnClickListener {
             val text = inputArea.text.toString()

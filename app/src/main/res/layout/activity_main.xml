@@ -41,14 +41,11 @@
             android:text="Delete"
             android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/tv_result"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Result Area"
-            android:textColor="@color/black"
-            android:textSize="30sp"
-            android:textStyle="bold" />
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp" />
 
     </LinearLayout>
 

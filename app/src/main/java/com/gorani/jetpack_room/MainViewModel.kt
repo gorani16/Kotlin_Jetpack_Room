@@ -1,8 +1,11 @@
 package com.gorani.jetpack_room
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.gorani.jetpack_room.database.TextDatabase
 import com.gorani.jetpack_room.entity.TextEntity
@@ -17,8 +20,15 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
+    @SuppressLint("StaticFieldLeak")
     private val context = getApplication<Application>().applicationContext
     private val db = TextDatabase.getDatabase(context)
+
+    private val _textList = MutableLiveData<List<TextEntity>>()
+    val textList: LiveData<List<TextEntity>> = _textList
+
+    private val _wordList = MutableLiveData<List<WordEntity>>()
+    val wordList: LiveData<List<WordEntity>> = _wordList
 
     /**
      * Coroutines 의 세 가지 Dispatchers 와 용도
@@ -32,10 +42,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      */
 
     fun getData() = viewModelScope.launch(Dispatchers.IO) {
-        val textData = db.textDao().getAllData().toString()
-        val wordData = db.wordDao().getAllData().toString()
-        Log.d("get_Data : ", textData)
-        Log.d("get_Data : ", wordData)
+        val textData = db.textDao().getAllData()
+        val wordData = db.wordDao().getAllData()
+        Log.d("get_Data : ", textData.toString())
+        Log.d("get_Data : ", wordData.toString())
+
+        _textList.postValue(textData)
+        _wordList.postValue(wordData)
+        Log.d("_textList : ", _textList.value.toString())
+
     }
 
     fun insertData(text: String) = viewModelScope.launch(Dispatchers.IO) {
